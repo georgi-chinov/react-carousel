@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-
 const Carousel = ({
   autoPlay = true,
-  autoplayInterval = 3000,
+  autoplayInterval = 4000,
   isLoop = true,
   initialIndex = 0,
   itemsArr = [],
@@ -24,10 +23,7 @@ const Carousel = ({
 
   const autoPlayHandler = () => {
     interval.current = setInterval(() => {
-      setCurrItemIndex((prev) => {
-        console.log((prev + 1) % items.length);
-        return (prev + 1) % items.length;
-      });
+      setCurrItemIndex((prev) => (prev + 1) % items.length);
     }, autoplayInterval);
   };
 
@@ -36,7 +32,7 @@ const Carousel = ({
     interval.current = null;
   };
 
-  const Dot = ({ active, id }) => (
+  const Dot = ({ active, elId }) => (
     <span
       style={{
         height: "10px",
@@ -48,48 +44,9 @@ const Carousel = ({
         transition: `background ${transitionTime}s ease-in-out`,
         cursor: "pointer",
       }}
-      onClick={(e) => setCurrItemIndex(id)}
+      onClick={() => setCurrItemIndex(elId)}
     />
   );
-  const CarouselElement = ({ index, item }) => {
-    return (
-      <div
-        style={{
-          flex: "0 0 100%",
-          maxWidth: "100%",
-          height: "60vh",
-          transform: `translateX(-${currItemIndex * 100}%)`,
-          opacity: index === currItemIndex ? 1 : 0,
-          transition: `opacity ${transitionTime}s ease-in-out`,
-        }}
-      >
-        {item.type === "image" && (
-          <img
-            src={item.content}
-            alt={`Carousel Item ${index + 1}`}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-            }}
-          />
-        )}
-        {item.type === "video" && (
-          <video
-            src={item.content}
-            controls
-            onPlay={pauseAutoPlay}
-            onEnded={autoPlayHandler}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-            }}
-          />
-        )}
-      </div>
-    );
-  };
 
   useEffect(() => {
     if (autoPlay) {
@@ -103,9 +60,7 @@ const Carousel = ({
     }
   }, [currItemIndex, isLoop]);
   useEffect(() => {
-    return () => {
-      pauseAutoPlay();
-    };
+    return () => pauseAutoPlay();
   }, []);
 
   return (
@@ -125,7 +80,42 @@ const Carousel = ({
           }}
         >
           {items.map((item, index) => (
-            <CarouselElement key={index} item={item} index={index} />
+            <div
+              key={index}
+              style={{
+                flex: "0 0 100%",
+                maxWidth: "100%",
+                height: "60vh",
+                transform: `translateX(-${currItemIndex * 100}%)`,
+                opacity: index === currItemIndex ? 1 : 0,
+                transition: `opacity ${transitionTime}s ease-in-out`,
+              }}
+            >
+              {item.type === "image" && (
+                <img
+                  src={item.content}
+                  alt={`Carousel Item ${index + 1}`}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              )}
+              {item.type === "video" && (
+                <video
+                  src={item.content}
+                  controls
+                  onPlay={pauseAutoPlay}
+                  onEnded={autoPlayHandler}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              )}
+            </div>
           ))}
         </div>
         <div>
@@ -136,7 +126,7 @@ const Carousel = ({
       </div>
       <div style={{ marginTop: "10px" }}>
         {items.map((item, index) => (
-          <Dot key={index} active={index === currItemIndex} id={index} />
+          <Dot key={index} active={index === currItemIndex} elId={index} />
         ))}
       </div>
     </>
